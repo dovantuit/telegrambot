@@ -39,53 +39,53 @@ def help_command(update, context):
 # Lets us use the /custom command
 def custom_command(update, context):
     update.message.reply_text('This is a custom command, you can add whatever text you want here.')
+#log
+def log_command(update, context):
+    print(f'\n\nUpdate: {update}\ncontext: {context}\n\n')
+    update.message.reply_text('log done')
 
 # make funcion write log to logBot.log file
-def writeLog(user, textFromUser):
+def writeLog(update, textFromUser):
     # create time for log
     import datetime
     now = datetime.datetime.now()
     logFile = open("logBot.log", "a")
-    logFile.write(f"{now}: {user} --> {textFromUser} \n")
+    logFile.write(f"{now}: {update.message.from_user.username}-{update.message.chat.id} --> {textFromUser} \n")
 
 def handle_response(text) -> str:
     text = str(text).lower()
     # Create your own response logic
-    if 'bot' in text:
-        if 'hello' in text:
-            return 'Hey there!'
-
-        elif 'jack79' in text:
-            return 'Xin chào tới chó điên, chào mừng bạn đã đến với con bot này'
-
-        elif 'how are you' in text:
-            return 'I\'m good!'
-        elif 'hehe' in text or 'hihi' in text or 'haha' in text or 'kk' in text:
-            return 'cười cc'
-        elif 'check giá' in text or 'giá' in text or 'btc' in text or 'bitcoin' in text:
+    if 'hello' in text:
+        return 'Hey there!'
+    elif 'jack79' in text:
+        return 'Xin chào tới chó điên, chào mừng bạn đã đến với con bot này'
+    elif 'how are you' in text:
+        return 'I\'m good!'
+    elif 'hehe' in text or 'hihi' in text or 'haha' in text or 'kk' in text:
+        return 'cười cc'
+    elif 'check giá' in text or 'giá' in text or 'btc' in text or 'bitcoin' in text:
+        tenCoin = 'BTC'
+        if 'btc' in text or 'bitcoin' in text or 'bit' in text:
             tenCoin = 'BTC'
-            if 'btc' in text or 'bitcoin' in text or 'bit' in text:
-                tenCoin = 'BTC'
-            if 'eth' in text:
-                tenCoin = 'ETH'
-            if 'xrp' in text:
-                tenCoin = 'XRP'
-            key = f"https://api.binance.com/api/v3/ticker/price?symbol={tenCoin}USDT"
-            response = requests.get(key)
-            data = json.loads(response.text)
-            return f'Giá {tenCoin} hiện tại là: ' + data['price']
-        elif 'bot ngu quá' in text or 'bot lol' in text or 'bot ngu' in text:
-            return 'Tao ngu vì tao là bot, tao chỉ làm theo lệnh của người lập trình thôi'
-        elif 'ai đẹp trai nhất' in text or 'ai đẹp trai' in text or 'ai đẹp trai nhất thế giới' in text:
-            return 'Tất nhiên là anh Tom rồi hihi'
-        elif 'mày đâu rồi' in text or 'mày đâu' in text or 'đâu' in text:
-            return 'Dạ em nghe đại ca ơi'
-        elif 'tên gì' in text or 'tên là gì' in text or 'tên là' in text:
-            return 'Tao là ông nội'
-        # create a string to store the response
-        response = 'bot không hiểu\n'
-        return response
-
+        if 'eth' in text:
+            tenCoin = 'ETH'
+        if 'xrp' in text:
+            tenCoin = 'XRP'
+        key = f"https://api.binance.com/api/v3/ticker/price?symbol={tenCoin}USDT"
+        response = requests.get(key)
+        data = json.loads(response.text)
+        return f'Giá {tenCoin} hiện tại là: ' + data['price']
+    elif 'bot ngu quá' in text or 'bot lol' in text or 'bot ngu' in text:
+        return 'Tao ngu vì tao là bot, tao chỉ làm theo lệnh của người lập trình thôi'
+    elif 'ai đẹp trai nhất' in text or 'ai đẹp trai' in text or 'ai đẹp trai nhất thế giới' in text:
+        return 'Tất nhiên là anh Tom rồi hihi'
+    elif 'mày đâu rồi' in text or 'mày đâu' in text or 'đâu' in text:
+        return 'Dạ em nghe đại ca ơi'
+    elif 'tên gì' in text or 'tên là gì' in text or 'tên là' in text:
+        return 'Tao là ông nội'
+    # create a string to store the response
+    response = 'bot không hiểu\n'
+    return response
 
 def handle_message(update, context):
     user_name = context.bot.get_chat(update.message.chat_id).first_name
@@ -95,12 +95,14 @@ def handle_message(update, context):
     response = ''    
     # Print a log for debugging
     print(f'userID ({update.message.chat.id}) says: "{text}" in: {message_type}')
-    writeLog(update.message.from_user.username, text)
-    
-    response = handle_response(text)
-
-    # Reply normal if the message is in private
-    update.message.reply_text(response)
+    writeLog(update, text)
+    if 'bot' in text:
+        response = handle_response(text)
+        # Reply normal if the message is in private
+        update.message.reply_text(response)
+    else:
+        return
+   
 
 
 # Log errors
@@ -117,6 +119,7 @@ if __name__ == '__main__':
     dp.add_handler(CommandHandler('start', start_command))
     dp.add_handler(CommandHandler('help', help_command))
     dp.add_handler(CommandHandler('custom', custom_command))
+    dp.add_handler(CommandHandler('log', log_command))
 
     # Messages
     dp.add_handler(MessageHandler(Filters.text, handle_message))
