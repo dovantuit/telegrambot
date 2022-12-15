@@ -83,7 +83,7 @@ def handle_response(text) -> str:
         elif 'tên gì' in text or 'tên là gì' in text or 'tên là' in text:
             return 'Tao là ông nội'
         # create a string to store the response
-        response = 'Jack chó điên nói gì v, tao ko hiểu =))))\nĐây là những lệnh mày có thể thử: \nhello\njack79\nhow are you\n'
+        response = 'bot không hiểu\n'
         return response
 
 
